@@ -13,7 +13,19 @@ module.exports = {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+    ],
+    script: [
+      { src: "https://kit.fontawesome.com/532d1551de.js", crossorigin: "anonymous" }
+    ],
+  },
+  router: {
+    extendRoutes(routes, resolve) {
+      routes.push({
+        name: 'fixedIndexHomePath',
+        path: '/index',
+        component: resolve(__dirname, 'pages/index.vue')
+      })
+    }
   },
   /*
   ** Customize the progress-bar color
@@ -23,11 +35,15 @@ module.exports = {
   ** Global CSS
   */
   css: [
+    "@/assets/scss/main.scss"
   ],
   /*
   ** Plugins to load before mounting the App
   */
   plugins: [
+    { src: "~/plugins/filters" },
+    { src: "~/plugins/vuelidate" },
+    { src: "~/plugins/toasted", ssr: false },
   ],
   /*
   ** Nuxt.js modules
@@ -42,6 +58,9 @@ module.exports = {
   */
   axios: {
   },
+  serverMiddleware: [
+    "~/server/routes/index.js"
+  ],
   /*
   ** Build configuration
   */

@@ -1,0 +1,173 @@
+<template>
+  <div class="full-page-takeover-window">
+    <div class="full-page-takeover-page">
+      <Header :title="`Step ${activeStep} of ${stepsLength}`" exitLink="/instructor/courses" />
+      <div class="full-page-takeover-header-bottom-progress">
+        <div :style="{width: progress}" class="full-page-takeover-header-bottom-progress-highlight"></div>
+      </div>
+      <div class="course-create full-page-takeover-container">
+        <div class="container">
+          <!-- STEP 1 of FORM  -->
+          <!-- <course-create-step-1 v-if="activeStep === 1" /> -->
+          <!-- STEP 1 END-->
+          <!-- STEP 2 of FORM -->
+          <!-- <course-create-step-2 v-if="activeStep === 2" /> -->
+          <!-- STEP 2 END -->
+          <keep-alive>
+            <component @stepUpdated="mergeFormData" :is="activeComponent" ref="activeComponent" />
+          </keep-alive>
+        </div>
+        <div class="full-page-footer-row">
+          <div class="container">
+            <div class="full-page-footer-col">
+              <div v-if="!isFirstStep">
+                <button @click.prevent="_previousStep" class="button is-large">Previous</button>
+              </div>
+              <div v-else class="empty-container"></div>
+            </div>
+            <div class="full-page-footer-col">
+              <div>
+                <!-- Show only if is not first step -->
+                <button
+                  v-if="!isLastStep"
+                  @click.prevent="_nextStep"
+                  class="button is-large float-right"
+                  :disabled="!canProceed"
+                >Continue</button>
+                <button
+                  v-else-if="isLastStep"
+                  @click="createCourse"
+                  class="button is-success is-large float-right"
+                  :disabled="!canProceed"
+                >Confirm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Header from "~/components/shared/Header";
+import CourseCreateStep1 from "~/components/instructor/CourseCreateStep1";
+import CourseCreateStep2 from "~/components/instructor/CourseCreateStep2";
+import MultiComponentMixins from "~/mixins/MultiComponentMixins";
+
+export default {
+  layout: "instructor",
+  components: {
+    Header,
+    CourseCreateStep1,
+    CourseCreateStep2
+  },
+  mixins: [MultiComponentMixins],
+  data() {
+    return {
+      activeStep: 1,
+      steps: ["CourseCreateStep1", "CourseCreateStep2"],
+      canProceed: false,
+      form: {
+        title: "",
+        category: ""
+      }
+    };
+  },
+  computed: {
+    categories() {
+      return this.$store.state.category.items;
+    }
+  },
+  async fetch({ store }) {
+    await store.dispatch("category/fetchCategories");
+  },
+  methods: {
+    _nextStep() {
+      // this.activeStep++;
+      this.nextStep(); // From mixins
+      this.$nextTick(
+        () => (this.canProceed = this.$refs.activeComponent.isValid)
+      ); // Get isValid value from current active component
+    },
+    _previousStep() {
+      // this.activeStep--;
+      this.previousStep(); // From mixins
+      this.canProceed = true; // Reset validation step
+    },
+    mergeFormData({ data, isValid }) {
+      this.form = { ...this.form, ...data };
+      this.canProceed = isValid;
+    },
+    createCourse() {
+      if (this.canProceed) {
+        this.$store
+          .dispatch("instructor/course/createCourse", this.form)
+          .then(() => this.$router.push("/instructor/courses"))
+          .catch(() => {
+            this.$toasted.error(
+              "Some error occur during course creation. Please try again later!",
+              {
+                duration: 3000,
+                action: {
+                  text: "Close",
+                  class: "has-text-white",
+                  onClick: (e, toastObject) => {
+                    toastObject.goAway(0);
+                  }
+                }
+              }
+            );
+          });
+      }
+    }
+  }
+};
+</script>
+
+<style lang="scss">
+.float-right {
+  float: right;
+}
+.empty-container {
+  width: 1px;
+  height: 1px;
+}
+.course-create {
+  &-wrapper {
+    margin-top: 60px;
+    text-align: center;
+  }
+  &-headerText {
+    font-weight: 500;
+    line-height: 1.1;
+    margin-top: 21px;
+    margin-bottom: 10.5px;
+    font-size: 36px;
+    font-weight: 300;
+  }
+  &-subtitle {
+    font-size: 24px;
+    font-weight: 300;
+    margin-top: 21px;
+    margin-bottom: 10.5px;
+  }
+  &-form {
+    margin-top: 60px;
+    &-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    &-field {
+      min-width: 552px;
+    }
+    .select {
+      width: 100%;
+      > select {
+        width: 100%;
+      }
+    }
+  }
+}
+</style>
