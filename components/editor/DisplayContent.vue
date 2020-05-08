@@ -20,7 +20,8 @@ import {
   BulletList,
   ListItem,
   TodoItem,
-  CodeBlockHighlight
+  CodeBlockHighlight,
+  Image
 } from "tiptap-extensions";
 
 import Title from "~/components/editor/components/Title";
@@ -53,6 +54,7 @@ export default {
         new Title(),
         new Subtitle(),
         new Heading({ levels: [1, 2, 3] }),
+        new Image(),
         new Bold(),
         new Code(),
         new Italic(),

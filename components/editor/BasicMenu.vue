@@ -29,6 +29,12 @@
       >
         <icon name="file-code" />
       </button>
+      <button
+          class="menubar__button"
+          @click="showImagePrompt(commands.image)"
+        >
+          <icon name="image" />
+      </button>
       <button class="menubar__button" @click="commands.horizontal_rule">
         <icon name="ruler-horizontal" />
       </button>
@@ -49,6 +55,14 @@ export default {
   components: { EditorMenuBar, Icon },
   props: {
     editor: Object
-  }
+  },
+  methods: {
+    showImagePrompt(command) {
+      const src = prompt('Enter the url of your image here')
+      if (src !== null) {
+        command({ src })
+      }
+    },
+  },
 };
 </script>

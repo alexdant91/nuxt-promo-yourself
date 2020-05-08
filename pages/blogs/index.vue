@@ -23,7 +23,18 @@
 
             <!-- end of blog -->
             <!-- pagination -->
-            <div class="section"></div>
+            <div v-if="pagination.pageCount && pagination.pageCount > 1" class="section">
+              <client-only placeholder="Loading...">
+                <paginate
+                  v-model="currentPage"
+                  :page-count="pagination.pageCount"
+                  :click-handler="fetchBlogs"
+                  :prev-text="'Prev'"
+                  :next-text="'Next'"
+                  :container-class="'paginationContainer'">
+                </paginate>
+              </client-only>
+            </div>
             <!-- end of pagination -->
           </div>
           <!-- side bar -->
@@ -36,8 +47,8 @@
                 </div>
                 <div class="sidebar-list">
                   <!-- Featured Blogs -->
-                  <p>
-                    <nuxt-link :to="``">Some favorite blog</nuxt-link>
+                  <p v-for="blog in featuredBlogs" :key="blog._id">
+                    <nuxt-link :to="`/blogs/${blog.slug}`">{{blog.title}}</nuxt-link>
                   </p>
                   <!-- Featured Blogs -->
                 </div>
@@ -54,14 +65,53 @@
 import { mapState } from "vuex";
 
 export default {
+  head: {
+    title: "Blog posts | My main share point | Alessandro D'Antoni"
+  },
   computed: {
     ...mapState({
-      blogs: ({ blog }) => blog.items.all
-    })
+      blogs: ({ blog }) => blog.items.all,
+      featuredBlogs: ({ blog }) => blog.items.featured,
+      pagination: ({ blog }) => blog.pagination
+    }),
+    currentPage: {
+      get() {
+        return this.$store.state.blog.pagination.pageNum
+      },
+      set(value) {
+        return this.$store.commit('blog/setPage', value);
+      }
+    }
   },
-  async fetch({ store }) {
-    await store.dispatch("blog/fetchBlogs");
-  }
+  async fetch({ store, query }) {
+    const filter = {};
+    const { pageNum, pageSize } = query;
+    if(pageNum && pageSize) {
+      filter.pageNum = parseInt(pageNum);
+      filter.pageSize = parseInt(pageSize);
+      store.commit('blog/setPage', filter.pageNum)
+    } else {
+      filter.pageNum = store.state.blog.pagination.pageNum;
+      filter.pageSize = store.state.blog.pagination.pageSize;
+    }
+    await store.dispatch("blog/fetchBlogs", filter);
+    await store.dispatch("blog/fetchFeaturedBlogs", {'filter[featured]': true});
+  },
+  methods: {
+    setQueryPaginationParams() {
+      const { pageNum, pageSize } = this.pagination;
+      this.$router.push({
+        query: {pageNum, pageSize}
+      });
+    },
+    fetchBlogs() {
+      const filter = {};
+      filter.pageNum = this.pagination.pageNum;
+      filter.pageSize = this.pagination.pageSize;
+      this.$store.dispatch("blog/fetchBlogs", filter)
+        .then(_ => this.setQueryPaginationParams());
+    }
+  },
 };
 </script>
 <style scoped>

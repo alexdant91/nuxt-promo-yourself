@@ -11,15 +11,15 @@
     <div class="centered">
       <div class="columns">
         <!-- Go to /instructor/courses -->
-        <div class="box" @click="() => $router.push('/instructor/courses')">
+        <div class="box" @click="$router.push('/instructor/courses')">
           <div>Courses</div>
         </div>
         <!-- Go to /instructor/blogs -->
-        <div class="box" @click="() => $router.push('/instructor/blogs')">
+        <div class="box" @click="$router.push('/instructor/blogs')">
           <div>Blogs</div>
         </div>
         <!-- Go to /instructor/heroes -->
-        <div class="box" @click="() => {}">
+        <div class="box" @click="$router.push('/instructor/heroes')">
           <div>Heroes</div>
         </div>
       </div>
@@ -27,13 +27,13 @@
   </div>
 </template>
 <script>
-import InstructorHeader from "~/components/shared/Header";
+import InstructorHeader from "~/components/shared/Header"
 
 export default {
   layout: "instructor",
   components: {
     InstructorHeader
-  }
+  },
 };
 </script>
 <style scoped lang="scss">

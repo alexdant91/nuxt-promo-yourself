@@ -77,46 +77,46 @@ export default {
       }
     };
   },
-  middleware: 'guest',
+  middleware: "guest",
   validations: {
     // Added by vuelidate
     form: {
       email: {
         isEmail: email,
         required
-        },
-        password: {
+      },
+      password: {
         required
-        }
+      }
     }
-    },
-    computed: {
+  },
+  computed: {
     isFormValid() {
-        return !this.$v.$invalid;
+      return !this.$v.$invalid;
     }
-    },
-    methods: {
+  },
+  methods: {
     login() {
-        this.$v.form.$touch(); // Run vuelidate validation
-        if (this.isFormValid) {
+      this.$v.form.$touch(); // Run vuelidate validation
+      if (this.isFormValid) {
         this.$store
-            .dispatch("auth/login", this.form) // Dispatch login action in store
-            .then(() => this.$router.push("/"))
-            .catch(() => 
-            this.$toasted.error('Wrong email or password', { 
-                duration: 3000,
-                action : {
-                    text : 'Close',
-                    class: 'has-text-white',
-                    onClick : (e, toastObject) => {
-                        toastObject.goAway(0);
-                    }
+          .dispatch("auth/login", this.form) // Dispatch login action in store
+          .then(() => this.$router.push("/"))
+          .catch(() =>
+            this.$toasted.error("Wrong email or password", {
+              duration: 3000,
+              action: {
+                text: "Close",
+                class: "has-text-white",
+                onClick: (e, toastObject) => {
+                  toastObject.goAway(0);
                 }
+              }
             })
-            )
-        }
+          );
+      }
     }
-    }
+  }
 };
 </script>
 

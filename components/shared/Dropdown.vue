@@ -30,6 +30,10 @@ export default {
     id: {
       type: String,
       required: true
+    },
+    featured: {
+      type: Boolean,
+      required: true
     }
   },
   data() {
@@ -48,8 +52,10 @@ export default {
       this.isActive = false;
     },
     emitOption(optionIndex) {
+      console.log(this.items[optionIndex])
       this.$emit("optionChanged", {
         command: this.items[optionIndex].command,
+        featured: this.featured,
         id: this.id,
         closeDropdown: this.closeDropdown
       });

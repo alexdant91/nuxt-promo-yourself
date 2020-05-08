@@ -63,6 +63,11 @@ export const actions = {
             .catch(err => {
                 return Promise.reject(err)
             })
+    },
+    updateFeaturedBlog({ commit, state }, {id, featured}) {
+        return this.$axios.$patch(`/api/v1/blogs/${id}`, { featured })
+            .then(_ => true)
+            .catch(err => Promise.reject(err));
     }
 }
 

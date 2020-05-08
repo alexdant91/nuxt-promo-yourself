@@ -34,14 +34,16 @@
                   :key="blog._id"
                   :id="`element${blog._id}`"
                   class="blog-card"
+                  :class="blog.featured ? 'featured' : ''"
                 >
                   <h2>
                     <nuxt-link :to="`/instructor/blog/${blog._id}/edit`">{{blog.title}}</nuxt-link>
                   </h2>
                   <div class="blog-card-footer">
                     <Dropdown
-                      :items="activeOptions()"
+                      :items="activeOptions(blog.featured)"
                       :id="blog._id"
+                      :featured="blog.featured"
                       @optionChanged="optionChanged"
                     />
                     <span>Created on {{new Date(blog.createdAt).toLocaleString()}}</span> -
@@ -96,18 +98,18 @@ export default {
     }),
     _draftedOptions() {
       return draftedOptions();
-    },
-    _publishedOptions() {
-      return publishedOptions();
-    },
-    activeOptionsTypes() {
-      return [this._draftedOptions, this._publishedOptions];
     }
   },
   async fetch({ store }) {
     await store.dispatch("instructor/blog/fetchInstructorBlogs");
   },
   methods: {
+     _publishedOptions(isFeatured) {
+      return publishedOptions(isFeatured);
+    },
+    activeOptionsTypes(isFeatured) {
+      return [this._draftedOptions, this._publishedOptions(isFeatured)];
+    },
     getMonth(date) {
       return this.monthNames[new Date(date).getMonth()];
     },
@@ -126,15 +128,46 @@ export default {
     currentActiveClass(tab) {
       return this.getActiveBlogsType() === tab ? "is-active" : "";
     },
-    activeOptions() {
-      const array = this.activeOptionsTypes;
+    activeOptions(isFeatured) {
+      const array = this.activeOptionsTypes(isFeatured);
       return array[this.activeBlog];
     },
-    optionChanged({ command, id, closeDropdown }) {
+    optionChanged({ command, id, featured, closeDropdown }) {
       if (command === "EDIT_BLOG" || command === "EDIT_DRAFT")
         return this.$router.push(`/instructor/blog/${id}/edit`);
       if (command === "DELETE_BLOG" || command === "DELETE_DRAFT")
         return this.deleteBlog(id, closeDropdown);
+      if (command === "TOGGLE_FEATURE")
+        return this.updateFeaturedBlog(id, !featured, closeDropdown);
+    },
+    updateFeaturedBlog(id, featured, closeDropdown) {
+      closeDropdown();
+      this.$store
+        .dispatch("instructor/blog/updateFeaturedBlog", {featured, id})
+        .then(_ => {
+          this.reloadBlogs();
+          this.$toasted.success("Blog has been updated!", {
+            duration: 3000,
+            action: {
+              text: "Close",
+              class: "has-text-white",
+              onClick: (e, toastObject) => {
+                toastObject.goAway(0);
+              }
+            }
+          });
+        }).catch(_ => {
+          this.$toasted.error("Blog cannot be updated!", {
+            duration: 3000,
+            action: {
+              text: "Close",
+              class: "has-text-white",
+              onClick: (e, toastObject) => {
+                toastObject.goAway(0);
+              }
+            }
+          });
+        })
     },
     reloadBlogs() {
       this.$store

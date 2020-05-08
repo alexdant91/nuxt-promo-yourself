@@ -34,7 +34,7 @@
         <div class="field">
           <label class="label">Course description</label>
           <div class="control">
-            <textarea
+            <!-- <textarea
               :value="course.description"
               @input="$event => emitCourseValue($event)"
               name="description"
@@ -42,7 +42,19 @@
               type="text"
               rows="6"
               placeholder="Write something catchy about the course"
-            ></textarea>
+            ></textarea>-->
+            <course-editor
+              :initialContent="course.description"
+              @editorUpdated="content => {
+                const $event = {
+                  target: {
+                    name: 'description',
+                    value: content
+                  }
+                };
+                return emitCourseValue($event);
+              }"
+            />
           </div>
         </div>
         <div class="field">
@@ -115,7 +127,12 @@
 </template>
 
 <script>
+import CourseEditor from "~/components/editor/CourseEditor";
+
 export default {
+  components: {
+    CourseEditor
+  },
   props: {
     course: {
       type: Object,

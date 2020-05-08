@@ -2,7 +2,9 @@
   <div class="editor editor-squished">
     <basic-menu :editor="editor">
       <template #saveButton>
-        <button @click="emitUpdate" :disabled="isSaving" class="button is-success button-save">Save</button>
+        <button @click="emitUpdate" :disabled="isSaving" class="button is-success button-save">
+          <i class="fal fa-save"></i>
+        </button>
       </template>
     </basic-menu>
     <bubble-menu :editor="editor" />
@@ -30,7 +32,8 @@ import {
   ListItem,
   TodoItem,
   CodeBlockHighlight,
-  Placeholder
+  Placeholder,
+  Image
 } from "tiptap-extensions";
 
 import Title from "~/components/editor/components/Title";
@@ -39,6 +42,8 @@ import Doc from "~/components/editor/components/Doc";
 
 import javascript from "highlight.js/lib/languages/javascript";
 import css from "highlight.js/lib/languages/css";
+
+import 'highlight.js/styles/night-owl.css';
 
 export default {
   components: {
@@ -80,6 +85,7 @@ export default {
           }
         }),
         new Heading({ levels: [1, 2, 3] }),
+        new Image(),
         new Bold(),
         new Code(),
         new Italic(),
@@ -116,7 +122,11 @@ export default {
       const html = this.editor.getHTML();
       const title = this.getNodeValueByName("title");
       const subtitle = this.getNodeValueByName("subtitle");
-      return { content: html, title, subtitle };
+
+      const htmlNotParsed = document.getElementsByClassName('editor__content')[0].getElementsByTagName('div')[0].innerHTML;
+      // console.log(htmlNotParsed)
+      // return { content: html, title, subtitle };
+      return { content: htmlNotParsed, title, subtitle };
     },
     getNodeValueByName(name) {
       const docContent = this.editor.state.doc.content;
@@ -126,7 +136,31 @@ export default {
       return "";
     },
     setInitialContent(content) {
-      this.editor.setContent(content);
+      // var el = document.createElement( 'html' );
+      // el.innerHTML = content;
+
+      // Array.from(el.querySelectorAll('pre code')).forEach(pre => {
+      //   const code = pre.innerHTML;
+      //   const h = hljs.highlightAuto(code, ["css", "javascript"]);
+      //   pre.innerHTML = h.value;
+      // })
+      
+      // const parsedContent = el.innerHTML;
+      // console.log(parsedContent);
+
+      // this.editor.setContent(parsedContent);
+      if(process.client) this.editor.setContent(content);
+
+      // console.log("SET_INITIAL_CONTENT")
+      // setTimeout(() => {
+      //   console.log("SET_TIMEOUT")
+      //   hljs.registerLanguage('javascript', javascript);
+      //   hljs.registerLanguage('css', css);
+
+      //   const h = hljs.highlightAuto(content, ["css", "javascript"]);
+      //   console.log(h);
+        
+      // })
     }
   }
 };
@@ -135,10 +169,17 @@ export default {
 <style scoped lang="scss">
 .button-save {
   float: right;
-  background-color: #23d160;
-  &:hover {
-    background-color: #2bc76c;
-  }
+  font-weight: bold;
+  font-size: 19px;
+  display: inline-flex;
+  // background: #3db46e;
+  background: transparent;
+  border: 0;
+  margin-right: 0.2rem;
+  margin-top: -7px;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #ffffff;
   &:disabled {
     cursor: not-allowed;
   }

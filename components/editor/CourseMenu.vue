@@ -1,0 +1,61 @@
+<template>
+  <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
+    <div class="menubar">
+      <button
+        class="menubar__button"
+        :class="{ 'is-active': isActive.bold() }"
+        @click.prevent="commands.bold()"
+      >
+        <Icon name="bold" size="small" />
+      </button>
+      <button
+        class="menubar__button"
+        :class="{ 'is-active': isActive.italic() }"
+        @click.prevent="commands.italic()"
+      >
+        <Icon name="italic" size="small" />
+      </button>
+      <button
+        class="menubar__button"
+        :class="{ 'is-active': isActive.bullet_list() }"
+        @click.prevent="commands.bullet_list"
+      >
+        <icon name="list-ul" />
+      </button>
+      <button
+        class="menubar__button"
+        :class="{ 'is-active': isActive.ordered_list() }"
+        @click.prevent="commands.ordered_list"
+      >
+        <icon name="list-ol" />
+      </button>
+      <button class="menubar__button" @click.prevent="showImagePrompt(commands.image)">
+        <icon name="image" />
+      </button>
+    </div>
+  </editor-menu-bar>
+</template>
+<script>
+import { EditorMenuBar } from "tiptap";
+import Icon from "~/components/shared/Icon";
+export default {
+  components: { EditorMenuBar, Icon },
+  props: {
+    editor: Object
+  },
+  methods: {
+    showImagePrompt(command) {
+      const src = prompt("Enter the url of your image here");
+      if (src !== null) {
+        command({ src });
+      }
+    }
+  }
+};
+</script>
+
+<style scoped>
+.menubar {
+  border-radius: inherit;
+}
+</style>

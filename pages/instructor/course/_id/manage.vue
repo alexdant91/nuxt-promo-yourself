@@ -9,6 +9,51 @@
             class="button is-primary is-inverted is-medium is-outlined"
           >Save</button>
         </div>
+        <div class="full-page-takeover-header-button">
+          <Modal
+            openTitle="Favorite"
+            openBtnClass="button is-primary is-inverted is-medium is-outlined"
+            title="Make Course Hero"
+            @opened="applyCourseValues"
+            @submitted="createCourseHero">
+            <div>
+              <form>
+                <div class="field">
+                  <label class="label">Hero title</label>
+                  <span class="label-info">Suggested 64 Characters</span>
+                  <div class="control">
+                    <input
+                      v-model="courseHero.title"
+                      class="input is-medium"
+                      type="text"
+                      placeholder="Amazing course discount">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label">Hero subtitle</label>
+                  <span class="label-info">Suggested 128 Characters</span>
+                  <input
+                    v-model="courseHero.subtitle"
+                    class="input is-medium"
+                    type="text"
+                    placeholder="Get all of the course for 9.99$">
+                </div>
+                <div class="field">
+                  <label class="label">Hero image</label>
+                  <span class="label-info">Image in format 3 by 1 (720 x 240)</span>
+                  <input
+                    v-model="courseHero.image"
+                    class="input is-medium"
+                    type="text"
+                    placeholder="Some image in format 3 by 1 (720 x 240)">
+                  <figure class="image is-3by1">
+                    <img :src="courseHero.image" alt="Hero featured image" />
+                  </figure>
+                </div>
+              </form>
+            </div>
+          </Modal>
+        </div>
       </template>
     </Header>
     <div class="course-manage">
@@ -48,18 +93,6 @@
             </aside>
           </div>
           <div class="column">
-            <!-- TargetStudents -->
-            <!-- <TargetStudents /> -->
-            <!-- TargetStudents End -->
-            <!-- LandingPage -->
-            <!-- <LandingPage /> -->
-            <!-- LandingPage End -->
-            <!-- Price -->
-            <!-- <Price /> -->
-            <!-- Price End -->
-            <!-- Status -->
-            <!-- <Status /> -->
-            <!-- Status End -->
             <keep-alive>
               <component :is="activeComponent" :course="course" :categories="categories" />
             </keep-alive>
@@ -72,6 +105,7 @@
 
 <script>
 import Header from "~/components/shared/Header";
+import Modal from "~/components/shared/Modal";
 import TargetStudents from "~/components/instructor/TargetStudents";
 import LandingPage from "~/components/instructor/LandingPage";
 import Price from "~/components/instructor/Price";
@@ -84,6 +118,7 @@ export default {
   layout: "instructor",
   components: {
     Header,
+    Modal,
     TargetStudents,
     LandingPage,
     Price,
@@ -93,7 +128,8 @@ export default {
   data() {
     return {
       activeStep: 1,
-      steps: ["TargetStudents", "LandingPage", "Price", "Status"]
+      steps: ["TargetStudents", "LandingPage", "Price", "Status"],
+      courseHero: { }
     };
   },
   computed: {
@@ -112,7 +148,7 @@ export default {
       this.$store
         .dispatch("instructor/course/updateCourse")
         .then(() => {
-          this.$toasted.success("Course updated!", {
+          this.$toasted.success("Course has been updated!", {
             duration: 3000,
             action: {
               text: "Close",
@@ -125,7 +161,47 @@ export default {
         })
         .catch(() => {
           this.$toasted.error(
-            "Some error occur during course update. Please try again later!",
+            "Course cannot be updated!",
+            {
+              duration: 3000,
+              action: {
+                text: "Close",
+                class: "has-text-white",
+                onClick: (e, toastObject) => {
+                  toastObject.goAway(0);
+                }
+              }
+            }
+          );
+        });
+    },
+    applyCourseValues() {
+      !this.courseHero.title && this.$set(this.courseHero, 'title', this.course.title);
+      !this.courseHero.subtitle && this.$set(this.courseHero, 'subtitle', this.course.subtitle);
+      !this.courseHero.image && this.$set(this.courseHero, 'image', this.course.image);
+      console.log(this.courseHero)
+    },
+    createCourseHero({closeModal}) {
+      const heroData = { ...this.courseHero };
+      heroData.product = { ...this.course };
+      this.$store.dispatch('hero/createHero', heroData)
+        .then(() => {
+          closeModal()
+          this.$toasted.success("Course hero has been updated!", {
+            duration: 3000,
+            action: {
+              text: "Close",
+              class: "has-text-white",
+              onClick: (e, toastObject) => {
+                toastObject.goAway(0);
+              }
+            }
+          });
+        })
+        .catch(() => {
+          closeModal()
+          this.$toasted.error(
+            "Course hero cannot be updated!",
             {
               duration: 3000,
               action: {

@@ -1,13 +1,14 @@
 <template>
   <nav class="navbar is-active" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
+    <div class="navbar-brand p-l-md">
       <nuxt-link class="navbar-item" to="/">
-        <h1 class="brand-title">Promo-Yourself</h1>
+        <h1 class="brand-title">Salve!</h1>
       </nuxt-link>
       <!-- Adds click to open -->
       <!-- Adds active class -->
       <a
-        @click="() => {}"
+        @click="isActive = !isActive"
+        :class="{'is-active': isActive}"
         role="button"
         class="navbar-burger burger"
         aria-label="menu"
@@ -21,16 +22,16 @@
     </div>
 
     <!-- Adds active class -->
-    <div id="navbarBasicExample" class="navbar-menu">
+    <div id="navbarBasicExample" class="navbar-menu" :class="{'is-active': isActive}">
       <div class="navbar-start">
-        <nuxt-link to="/" class="navbar-item">Home</nuxt-link>
-        <nuxt-link to="#" class="navbar-item">Courses</nuxt-link>
-        <nuxt-link to="/blogs" class="navbar-item">Blogs</nuxt-link>
-        <nuxt-link to="#" class="navbar-item">About</nuxt-link>
-        <nuxt-link to="#" class="navbar-item">Cv</nuxt-link>
+        <nav-link to="/" class="navbar-item">Home</nav-link>
+        <nav-link to="/courses" class="navbar-item">Courses</nav-link>
+        <nav-link to="/blogs" class="navbar-item">Blogs</nav-link>
+        <nav-link to="/about" class="navbar-item">About</nav-link>
+        <nav-link to="/cv" class="navbar-item">Cv</nav-link>
       </div>
 
-      <div class="navbar-end">
+      <div class="navbar-end p-r-md">
         <div class="navbar-item">
           <div class="buttons">
             <!-- If Authenticated -->
@@ -62,6 +63,11 @@
 import { mapGetters } from "vuex";
 
 export default {
+  data() {
+    return {
+      isActive: false
+    };
+  },
   computed: {
     ...mapGetters({
       user: "auth/authUser",
@@ -83,6 +89,7 @@ export default {
 .brand-title {
   font-size: 35px;
   font-weight: bold;
+  font-family: "Leckerli One", cursive !important;
 }
 .navbar-brand {
   padding-right: 30px;

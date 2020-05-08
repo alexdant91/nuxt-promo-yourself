@@ -3,22 +3,33 @@
     <div class="card-content">
       <div class="media">
         <div class="media-content">
-          <p class="title is-4">Some Super Title</p>
+          <p class="title is-4">{{blog.title}}</p>
           <p class="subtitle is-6">
-            <i>Some Super Subtitle</i>
+            <i>{{blog.subtitle}}</i>
           </p>
         </div>
       </div>
       <div class="content">
-        Some Description
+        By {{blog.author.name}}
         <br />
       </div>
     </div>
     <footer class="card-footer">
-      <nuxt-link :to="'#'" class="card-footer-item">Read More</nuxt-link>
+      <nuxt-link :to="`/blogs/${blog.slug}`" class="card-footer-item">Read More</nuxt-link>
     </footer>
   </div>
 </template>
+
+<script>
+export default {
+  props: {
+    blog: {
+      type: Object,
+      required: true
+    }
+  }
+}
+</script>
 
 <style lang="scss" scoped>
 // card item
